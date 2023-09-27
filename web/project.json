@@ -1,0 +1,19 @@
+{
+  "root": "web",
+  "targets": {
+    "test": {},
+    "build": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "build"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "dev"
+      }
+    }
+  },
+  "implicitDependencies": ["api"]
+}

@@ -1,0 +1,20 @@
+{
+  "root": "api",
+  "targets": {
+    "test": {},
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "api",
+        "command": "go build -o dist/api ."
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "api",
+        "command": "go run ."
+      }
+    }
+  }
+}
