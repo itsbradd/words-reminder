@@ -3,13 +3,22 @@ package bootstrap
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sonngocme/words-reminder-be/db"
 	"go.uber.org/fx"
+	"os"
 )
 
+func formatDBSource() string {
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	return fmt.Sprintf("%s:%s@/%s?parseTime=true", user, pass, dbName)
+}
+
 func NewDBConn(lc fx.Lifecycle) (*db.Queries, error) {
-	conn, err := sql.Open("mysql", "root:thisisverysecret@/words_reminder?parseTime=true")
+	conn, err := sql.Open("mysql", formatDBSource())
 	if err != nil {
 		return nil, err
 	}

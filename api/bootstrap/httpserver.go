@@ -6,6 +6,7 @@ import (
 	"github.com/sonngocme/words-reminder-be/pkg"
 	"go.uber.org/fx"
 	"log"
+	"os"
 )
 
 func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
@@ -20,7 +21,8 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go func() {
-				if err := app.Listen(":3001"); err != nil {
+				port := os.Getenv("PORT")
+				if err := app.Listen(port); err != nil {
 					log.Fatal(err)
 				}
 			}()
