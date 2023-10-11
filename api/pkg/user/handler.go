@@ -9,6 +9,7 @@ import (
 
 type service interface {
 	SignUpUser(context.Context, db.SignUpUserParams) (sql.Result, error)
+	HashPassword(string) (string, error)
 }
 
 type Handler struct {
@@ -33,9 +34,14 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 		return err
 	}
 
+	hashedPass, err := h.s.HashPassword((*signUpInfo).Password)
+	if err != nil {
+		return err
+	}
+
 	_, err = h.s.SignUpUser(context.Background(), db.SignUpUserParams{
 		Username: (*signUpInfo).Username,
-		Password: (*signUpInfo).Password,
+		Password: hashedPass,
 	})
 
 	if err != nil {

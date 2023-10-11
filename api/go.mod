@@ -8,6 +8,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/samber/lo v1.38.1
 	go.uber.org/fx v1.20.0
+	golang.org/x/crypto v0.7.0
 )
 
 require (
