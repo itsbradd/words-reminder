@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const getUser = `-- name: GetUser :one
@@ -24,4 +25,18 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 		&i.RefreshToken,
 	)
 	return i, err
+}
+
+const signUpUser = `-- name: SignUpUser :execresult
+INSERT INTO user (username, password)
+VALUES (?, ?)
+`
+
+type SignUpUserParams struct {
+	Username string
+	Password string
+}
+
+func (q *Queries) SignUpUser(ctx context.Context, arg SignUpUserParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, signUpUser, arg.Username, arg.Password)
 }

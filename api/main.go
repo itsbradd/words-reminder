@@ -2,17 +2,16 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"log"
+	"github.com/sonngocme/words-reminder-be/bootstrap"
+	usermodule "github.com/sonngocme/words-reminder-be/pkg/user"
+	"go.uber.org/fx"
 )
 
 func main() {
-	app := fiber.New()
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello World!")
-	})
-
-	if err := app.Listen(":3001"); err != nil {
-		log.Fatal(err)
-	}
+	fx.New(
+		bootstrap.ProvideHTTPServer(),
+		bootstrap.ProvideDBConn(),
+		usermodule.New(),
+		fx.Invoke(func(*fiber.App) {}),
+	).Run()
 }
