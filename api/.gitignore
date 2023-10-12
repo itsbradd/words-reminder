@@ -4,3 +4,6 @@ dist
 # IDEs
 .ide*
 .vs*
+
+# temp
+tmp
