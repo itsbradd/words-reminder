@@ -1,1 +1,6 @@
+# Build
 dist
+
+# IDEs
+.ide*
+.vs*
