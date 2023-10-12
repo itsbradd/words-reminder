@@ -19,7 +19,7 @@ $ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 $ go mod download
 
 # Start the server
-$ go run .
+$ go run cmd/main/main.go
 ```
 
 ## Migrations management (Local)

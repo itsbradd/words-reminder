@@ -6,14 +6,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "api",
-        "command": "go build -o dist/api ."
+        "command": "go build -o dist/api cmd/main/main.go"
       }
     },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "api",
-        "command": "go run ."
+        "command": "go run cmd/main/main.go"
       }
     }
   }
