@@ -7,16 +7,16 @@ import (
 	"github.com/sonngocme/words-reminder-be/db"
 )
 
-type service interface {
+type Service interface {
 	SignUpUser(context.Context, db.SignUpUserParams) (sql.Result, error)
 	HashPassword(string) (string, error)
 }
 
 type Handler struct {
-	s service
+	s Service
 }
 
-func NewHandler(s service) Handler {
+func NewHandler(s Service) Handler {
 	return Handler{
 		s: s,
 	}

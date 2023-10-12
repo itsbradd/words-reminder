@@ -10,10 +10,7 @@ func New() fx.Option {
 		pkg.ProvideRouters(NewRouter),
 		fx.Provide(
 			NewHandler,
-			fx.Annotate(
-				NewService,
-				fx.As(new(service)),
-			),
+			NewService,
 			NewStorage,
 		),
 	)
