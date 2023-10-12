@@ -22,6 +22,16 @@ $ go mod download
 $ go run cmd/main/main.go
 ```
 
+### Live-reloading
+[Air](https://github.com/cosmtrek/air)
+```sh
+# Install Air library
+$ go install github.com/cosmtrek/air@latest
+
+# Start the server and watching for changes
+$ air
+```
+
 ## Migrations management (Local)
 ```sh
 # Create a new migration file
