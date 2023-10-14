@@ -2,10 +2,14 @@
   "name": "words-reminder",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky install"
+  },
   "private": true,
   "devDependencies": {
+    "@commitlint/cli": "^17.8.0",
     "@nx/js": "16.9.1",
+    "husky": "^8.0.0",
     "nx": "16.9.1"
   },
   "workspaces": [
