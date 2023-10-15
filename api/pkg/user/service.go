@@ -4,22 +4,28 @@ import (
 	"context"
 	"database/sql"
 	"github.com/sonngocme/words-reminder-be/db"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Storage interface {
 	SignUpUser(ctx context.Context, arg db.SignUpUserParams) (sql.Result, error)
 }
 
+type PassHasher interface {
+	HashPassword(pass string) (string, error)
+	VerifyPassword(hashedPassword, pass string) error
+}
+
 type service struct {
-	storage Storage
+	storage    Storage
+	passHasher PassHasher
 }
 
 var _ Service = (*service)(nil)
 
-func NewService(storage Storage) Service {
+func NewService(storage Storage, passHasher PassHasher) Service {
 	return &service{
-		storage: storage,
+		storage:    storage,
+		passHasher: passHasher,
 	}
 }
 
@@ -28,7 +34,6 @@ func (s *service) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (sql.
 }
 
 func (s *service) HashPassword(pass string) (string, error) {
-	// TODO: Move Bcrypt hashing password to another pkg
-	bytes, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-	return string(bytes), err
+	res, err := s.passHasher.HashPassword(pass)
+	return res, err
 }

@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/sonngocme/words-reminder-be/pkg"
+	"github.com/sonngocme/words-reminder-be/pkg/passhashing"
 	"go.uber.org/fx"
 )
 
@@ -10,7 +11,10 @@ func New() fx.Option {
 		pkg.ProvideRouters(NewRouter),
 		fx.Provide(
 			NewHandler,
-			NewService,
+			fx.Annotate(
+				NewService,
+				fx.From(new(Storage), new(*passhashing.Service)),
+			),
 			NewStorage,
 		),
 	)
