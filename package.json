@@ -8,6 +8,7 @@
   "private": true,
   "devDependencies": {
     "@commitlint/cli": "^17.8.0",
+    "@commitlint/config-conventional": "^17.8.0",
     "@nx/js": "16.9.1",
     "husky": "^8.0.0",
     "nx": "16.9.1"
