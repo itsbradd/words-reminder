@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"database/sql"
 	"github.com/sonngocme/words-reminder-be/db"
 )
 
@@ -16,6 +15,6 @@ func NewStorage(db *db.Queries) Storage {
 	return &mySQLStorage{db: db}
 }
 
-func (s *mySQLStorage) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (sql.Result, error) {
+func (s *mySQLStorage) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error) {
 	return s.db.SignUpUser(ctx, arg)
 }

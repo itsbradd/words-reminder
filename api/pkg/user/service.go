@@ -2,12 +2,11 @@ package user
 
 import (
 	"context"
-	"database/sql"
 	"github.com/sonngocme/words-reminder-be/db"
 )
 
 type Storage interface {
-	SignUpUser(ctx context.Context, arg db.SignUpUserParams) (sql.Result, error)
+	SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error)
 }
 
 type PassHasher interface {
@@ -29,7 +28,7 @@ func NewService(storage Storage, passHasher PassHasher) Service {
 	}
 }
 
-func (s *service) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (sql.Result, error) {
+func (s *service) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error) {
 	return s.storage.SignUpUser(ctx, arg)
 }
 

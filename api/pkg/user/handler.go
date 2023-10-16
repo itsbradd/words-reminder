@@ -2,13 +2,12 @@ package user
 
 import (
 	"context"
-	"database/sql"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
 )
 
 type Service interface {
-	SignUpUser(context.Context, db.SignUpUserParams) (sql.Result, error)
+	SignUpUser(context.Context, db.SignUpUserParams) (int64, error)
 	HashPassword(string) (string, error)
 }
 

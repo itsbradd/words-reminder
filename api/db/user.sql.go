@@ -7,10 +7,10 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const getUser = `-- name: GetUser :one
+# name: GetUser :one
 SELECT id, username, password, refresh_token FROM user
 WHERE id = ? LIMIT 1
 `
@@ -27,7 +27,8 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
-const signUpUser = `-- name: SignUpUser :execresult
+const signUpUser = `-- name: SignUpUser :execlastid
+# name: SignUpUser :execlastid
 INSERT INTO user (username, password)
 VALUES (?, ?)
 `
@@ -37,6 +38,10 @@ type SignUpUserParams struct {
 	Password string
 }
 
-func (q *Queries) SignUpUser(ctx context.Context, arg SignUpUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, signUpUser, arg.Username, arg.Password)
+func (q *Queries) SignUpUser(ctx context.Context, arg SignUpUserParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, signUpUser, arg.Username, arg.Password)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }
