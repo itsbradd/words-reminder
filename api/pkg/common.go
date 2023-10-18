@@ -25,3 +25,8 @@ func AsRoute(f any) any {
 		fx.ResultTags(`group:"routers"`),
 	)
 }
+
+type SuccessRes[T any] struct {
+	Message string `json:"message"`
+	Data    T      `json:"data"`
+}

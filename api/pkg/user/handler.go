@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
+	"github.com/sonngocme/words-reminder-be/pkg"
 	"github.com/sonngocme/words-reminder-be/pkg/jwt"
 	"time"
 )
@@ -84,5 +85,9 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 	if err != nil {
 		return nil
 	}
-	return c.SendString(accessToken)
+
+	return c.Status(200).JSON(pkg.SuccessRes[string]{
+		Message: "Signup success!",
+		Data:    accessToken,
+	})
 }
