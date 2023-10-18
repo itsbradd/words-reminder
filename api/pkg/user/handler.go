@@ -20,6 +20,7 @@ type JWTService interface {
 	GenSubjectClaim(val any) jwt.GenClaimOpts
 	GenAudienceClaim(val string) jwt.GenClaimOpts
 	GenIssueAtClaim(val time.Time) jwt.GenClaimOpts
+	GenExpireTimeClaim(val time.Time) jwt.GenClaimOpts
 }
 
 type Handler struct {
@@ -72,5 +73,16 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 	if err != nil {
 		return nil
 	}
-	return c.SendString(token)
+
+	accessToken, err := h.jwt.NewWithClaims(jwt.MapClaims{},
+		h.jwt.GenIssuerClaim("Words Reminder"),
+		h.jwt.GenSubjectClaim(userId),
+		h.jwt.GenAudienceClaim("Words Reminder"),
+		h.jwt.GenIssueAtClaim(time.Now()),
+		h.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
+	)
+	if err != nil {
+		return nil
+	}
+	return c.SendString(accessToken)
 }
