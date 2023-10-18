@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const getUser = `-- name: GetUser :one
@@ -25,6 +26,22 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 		&i.RefreshToken,
 	)
 	return i, err
+}
+
+const setUserRefreshToken = `-- name: SetUserRefreshToken :exec
+# name: SetUserRefreshToken :exec
+UPDATE user SET refresh_token = ?
+WHERE id = ?
+`
+
+type SetUserRefreshTokenParams struct {
+	RefreshToken sql.NullString
+	ID           int32
+}
+
+func (q *Queries) SetUserRefreshToken(ctx context.Context, arg SetUserRefreshTokenParams) error {
+	_, err := q.db.ExecContext(ctx, setUserRefreshToken, arg.RefreshToken, arg.ID)
+	return err
 }
 
 const signUpUser = `-- name: SignUpUser :execlastid
