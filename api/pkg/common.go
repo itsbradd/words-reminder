@@ -30,3 +30,9 @@ type SuccessRes[T any] struct {
 	Message string `json:"message"`
 	Data    T      `json:"data"`
 }
+
+type FailRes[T any] struct {
+	ErrorCode int    `json:"errorCode"`
+	Message   string `json:"message"`
+	Errors    T      `json:"errors,omitempty"`
+}
