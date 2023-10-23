@@ -3,12 +3,21 @@ package user
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/sonngocme/words-reminder-be/db"
+	"github.com/sonngocme/words-reminder-be/pkg/jwt"
+	"time"
+)
+
+var (
+	ErrGenRefreshToken = errors.New("errored when generating refresh token")
+	ErrGenAccessToken  = errors.New("errored when generating access token")
 )
 
 type Storage interface {
 	SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error)
 	SetUserRefreshToken(ctx context.Context, arg db.SetUserRefreshTokenParams) error
+	GetUserByUsername(ctx context.Context, username string) (db.User, error)
 }
 
 type PassHasher interface {
@@ -19,14 +28,16 @@ type PassHasher interface {
 type service struct {
 	storage    Storage
 	passHasher PassHasher
+	jwt        JWTService
 }
 
 var _ Service = (*service)(nil)
 
-func NewService(storage Storage, passHasher PassHasher) Service {
+func NewService(storage Storage, passHasher PassHasher, jwt JWTService) Service {
 	return &service{
 		storage:    storage,
 		passHasher: passHasher,
+		jwt:        jwt,
 	}
 }
 
@@ -39,6 +50,10 @@ func (s *service) HashPassword(pass string) (string, error) {
 	return res, err
 }
 
+func (s *service) VerifyPassword(hashedPass, pass string) error {
+	return s.passHasher.VerifyPassword(hashedPass, pass)
+}
+
 func (s *service) SetUserRefreshToken(ctx context.Context, id int64, token string) error {
 	return s.storage.SetUserRefreshToken(ctx, db.SetUserRefreshTokenParams{
 		RefreshToken: sql.NullString{
@@ -47,4 +62,37 @@ func (s *service) SetUserRefreshToken(ctx context.Context, id int64, token strin
 		},
 		ID: int32(id),
 	})
+}
+
+func (s *service) GetUserByUsername(ctx context.Context, username string) (db.User, error) {
+	return s.storage.GetUserByUsername(ctx, username)
+}
+
+func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (string, string, error) {
+	token, err := s.jwt.NewWithClaims(jwt.MapClaims{},
+		s.jwt.GenIssuerClaim("Words Reminder"),
+		s.jwt.GenSubjectClaim(id),
+		s.jwt.GenAudienceClaim("Words Reminder"),
+		s.jwt.GenIssueAtClaim(time.Now()),
+	)
+	if err != nil {
+		return "", "", ErrGenRefreshToken
+	}
+
+	err = s.SetUserRefreshToken(ctx, id, token)
+	if err != nil {
+		return "", "", ErrGenRefreshToken
+	}
+
+	accessToken, err := s.jwt.NewWithClaims(jwt.MapClaims{},
+		s.jwt.GenIssuerClaim("Words Reminder"),
+		s.jwt.GenSubjectClaim(id),
+		s.jwt.GenAudienceClaim("Words Reminder"),
+		s.jwt.GenIssueAtClaim(time.Now()),
+		s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
+	)
+	if err != nil {
+		return "", "", ErrGenAccessToken
+	}
+	return token, accessToken, nil
 }

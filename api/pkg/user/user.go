@@ -17,7 +17,7 @@ func New() fx.Option {
 			),
 			fx.Annotate(
 				NewService,
-				fx.From(new(Storage), new(*passhashing.Service)),
+				fx.From(new(Storage), new(*passhashing.Service), new(*jwt.Service)),
 			),
 			NewStorage,
 		),
