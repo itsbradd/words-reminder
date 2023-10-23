@@ -22,3 +22,7 @@ func (s *mySQLStorage) SignUpUser(ctx context.Context, arg db.SignUpUserParams) 
 func (s *mySQLStorage) SetUserRefreshToken(ctx context.Context, arg db.SetUserRefreshTokenParams) error {
 	return s.db.SetUserRefreshToken(ctx, arg)
 }
+
+func (s *mySQLStorage) GetUserByUsername(ctx context.Context, username string) (db.User, error) {
+	return s.db.GetUserByUsername(ctx, username)
+}

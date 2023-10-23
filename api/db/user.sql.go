@@ -28,6 +28,24 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
+const getUserByUsername = `-- name: GetUserByUsername :one
+# name: GetUserByUsername :one
+SELECT id, username, password, refresh_token FROM user
+WHERE username = ? LIMIT 1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.RefreshToken,
+	)
+	return i, err
+}
+
 const setUserRefreshToken = `-- name: SetUserRefreshToken :exec
 # name: SetUserRefreshToken :exec
 UPDATE user SET refresh_token = ?
