@@ -16,7 +16,7 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 			var e *fiber.Error
 			var failRes *pkg.FailRes
 			if errors.As(err, &failRes) {
-				return ctx.Status(failRes.ErrorCode).JSON(failRes)
+				return ctx.Status(failRes.StatusCode).JSON(failRes)
 			} else if errors.As(err, &e) {
 				return ctx.Status(e.Code).SendString(e.Error())
 			}
