@@ -46,7 +46,7 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 
 	err := signUpInfo.Validate()
 	if err != nil {
-		return err
+		return pkg.NewBodyValidationErr(err.(validation.Errors))
 	}
 
 	hashedPass, err := h.s.HashPassword((*signUpInfo).Password)
