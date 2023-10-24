@@ -105,11 +105,11 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 		return nil, &pkg.FailRes{
 			StatusCode: fiber.StatusBadRequest,
 			ErrorCode:  fiber.StatusBadRequest,
-			Message:    "User not found",
+			Message:    "user not found",
 			Errors: struct {
 				Username string `json:"username"`
 			}{
-				Username: "Username is not valid",
+				Username: "username is not valid",
 			},
 		}
 	}
@@ -119,11 +119,11 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 		return nil, &pkg.FailRes{
 			StatusCode: fiber.StatusBadRequest,
 			ErrorCode:  fiber.StatusBadRequest,
-			Message:    "Password is not match",
+			Message:    "password is not match",
 			Errors: struct {
 				Password string `json:"password"`
 			}{
-				Password: "Password is not match",
+				Password: "password is not match",
 			},
 		}
 	}
