@@ -1,6 +1,14 @@
 package pkg
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"errors"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/gofiber/fiber/v2"
+)
+
+var (
+	ErrBodyValidation = errors.New("invalid parameters")
+)
 
 var (
 	ErrParseReqBody = &FailRes{
@@ -25,4 +33,17 @@ type FailRes struct {
 
 func (f *FailRes) Error() string {
 	return f.Message
+}
+
+func NewBodyValidationErr(err validation.Errors, message ...string) *FailRes {
+	msg := ErrBodyValidation.Error()
+	if message != nil {
+		msg = message[0]
+	}
+	return &FailRes{
+		StatusCode: fiber.StatusBadRequest,
+		ErrorCode:  fiber.StatusBadRequest,
+		Message:    msg,
+		Errors:     err,
+	}
 }
