@@ -96,12 +96,7 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 func (h Handler) Login(c *fiber.Ctx) error {
 	loginInfo := new(LoginInfo)
 	if err := c.BodyParser(loginInfo); err != nil {
-		return &pkg.FailRes{
-			StatusCode: fiber.StatusBadRequest,
-			ErrorCode:  fiber.StatusBadRequest,
-			Message:    "Invalid parameters",
-			Errors:     nil,
-		}
+		return pkg.ErrParseReqBody
 	}
 
 	credentials, err := h.s.Login(c.Context(), *loginInfo)
