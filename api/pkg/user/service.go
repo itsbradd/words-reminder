@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
+	"github.com/sonngocme/words-reminder-be/pkg"
 	"github.com/sonngocme/words-reminder-be/pkg/jwt"
 	"time"
 )
@@ -95,4 +98,59 @@ func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (strin
 		return "", "", ErrGenAccessToken
 	}
 	return token, accessToken, nil
+}
+
+func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
+	err := info.Validate()
+	if err != nil {
+		return nil, &pkg.FailRes{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    "Invalid parameters",
+			Errors:     err.(validation.Errors),
+		}
+	}
+
+	user, err := s.GetUserByUsername(ctx, info.Username)
+	if err != nil {
+		return nil, &pkg.FailRes{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    "User not found",
+			Errors: struct {
+				Username string `json:"username"`
+			}{
+				Username: "Username is not valid",
+			},
+		}
+	}
+
+	err = s.VerifyPassword(user.Password, info.Password)
+	if err != nil {
+		return nil, &pkg.FailRes{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    "Password is not match",
+			Errors: struct {
+				Password string `json:"password"`
+			}{
+				Password: "Password is not match",
+			},
+		}
+	}
+
+	refresh, access, err := s.GenRefreshAndAccessToken(ctx, int64(user.ID))
+	if err != nil {
+		return nil, &pkg.FailRes{
+			StatusCode: fiber.StatusInternalServerError,
+			ErrorCode:  fiber.StatusInternalServerError,
+			Message:    "Something went wrong",
+			Errors:     nil,
+		}
+	}
+
+	return &Credentials{
+		RefreshToken: refresh,
+		AccessToken:  access,
+	}, nil
 }

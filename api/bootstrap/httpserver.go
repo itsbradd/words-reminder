@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/pkg"
 	"go.uber.org/fx"
@@ -10,7 +11,20 @@ import (
 )
 
 func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			var e *fiber.Error
+			var failRes *pkg.FailRes
+			if errors.As(err, &failRes) {
+				return ctx.Status(failRes.ErrorCode).JSON(failRes)
+			} else if errors.As(err, &e) {
+				return ctx.Status(e.Code).SendString(e.Error())
+			}
+
+			return nil
+		},
+	})
+
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 

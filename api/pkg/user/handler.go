@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
 	"github.com/sonngocme/words-reminder-be/pkg"
@@ -14,9 +13,7 @@ type Service interface {
 	SignUpUser(context.Context, db.SignUpUserParams) (int64, error)
 	HashPassword(string) (string, error)
 	SetUserRefreshToken(ctx context.Context, id int64, token string) error
-	GetUserByUsername(ctx context.Context, username string) (db.User, error)
-	VerifyPassword(hashedPass, pass string) error
-	GenRefreshAndAccessToken(ctx context.Context, id int64) (string, string, error)
+	Login(ctx context.Context, info LoginInfo) (*Credentials, error)
 }
 
 type JWTService interface {
@@ -99,55 +96,21 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 func (h Handler) Login(c *fiber.Ctx) error {
 	loginInfo := new(LoginInfo)
 	if err := c.BodyParser(loginInfo); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(pkg.FailRes[any]{
-			ErrorCode: fiber.StatusBadRequest,
-			Message:   "Invalid parameters",
-			Errors:    nil,
-		})
+		return &pkg.FailRes{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    "Invalid parameters",
+			Errors:     nil,
+		}
 	}
 
-	err := loginInfo.Validate()
+	credentials, err := h.s.Login(c.Context(), *loginInfo)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(pkg.FailRes[validation.Errors]{
-			ErrorCode: fiber.StatusBadRequest,
-			Message:   "Invalid parameters",
-			Errors:    err.(validation.Errors),
-		})
+		return err
 	}
 
-	user, err := h.s.GetUserByUsername(context.Background(), loginInfo.Username)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(pkg.FailRes[any]{
-			ErrorCode: fiber.StatusBadRequest,
-			Message:   "User not found",
-			Errors:    nil,
-		})
-	}
-
-	err = h.s.VerifyPassword(user.Password, loginInfo.Password)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(pkg.FailRes[any]{
-			ErrorCode: fiber.StatusBadRequest,
-			Message:   "Password is not match",
-			Errors: struct {
-				Password string `json:"password"`
-			}{
-				Password: "Password is not match",
-			},
-		})
-	}
-
-	refresh, access, err := h.s.GenRefreshAndAccessToken(context.Background(), int64(user.ID))
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(pkg.FailRes[any]{
-			ErrorCode: fiber.StatusInternalServerError,
-			Message:   "Something went wrong",
-			Errors:    nil,
-		})
-	}
-
-	return c.JSON(Credentials{
-		RefreshToken: refresh,
-		AccessToken:  access,
+	return c.JSON(pkg.SuccessRes[Credentials]{
+		Message: "Login success",
+		Data:    *credentials,
 	})
 }

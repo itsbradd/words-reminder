@@ -31,8 +31,13 @@ type SuccessRes[T any] struct {
 	Data    T      `json:"data"`
 }
 
-type FailRes[T any] struct {
-	ErrorCode int    `json:"errorCode"`
-	Message   string `json:"message"`
-	Errors    T      `json:"errors,omitempty"`
+type FailRes struct {
+	StatusCode int    `json:"-"`
+	ErrorCode  int    `json:"errorCode"`
+	Message    string `json:"message"`
+	Errors     any    `json:"errors,omitempty"`
+}
+
+func (f *FailRes) Error() string {
+	return f.Message
 }
