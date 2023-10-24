@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
 	"github.com/sonngocme/words-reminder-be/pkg"
@@ -97,6 +98,10 @@ func (h Handler) Login(c *fiber.Ctx) error {
 	loginInfo := new(LoginInfo)
 	if err := c.BodyParser(loginInfo); err != nil {
 		return pkg.ErrParseReqBody
+	}
+	err := loginInfo.Validate()
+	if err != nil {
+		return pkg.NewBodyValidationErr(err.(validation.Errors))
 	}
 
 	credentials, err := h.s.Login(c.Context(), *loginInfo)

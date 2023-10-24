@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sonngocme/words-reminder-be/db"
 	"github.com/sonngocme/words-reminder-be/pkg"
@@ -101,11 +100,6 @@ func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (strin
 }
 
 func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
-	err := info.Validate()
-	if err != nil {
-		return nil, pkg.NewBodyValidationErr(err.(validation.Errors))
-	}
-
 	user, err := s.GetUserByUsername(ctx, info.Username)
 	if err != nil {
 		return nil, &pkg.FailRes{
