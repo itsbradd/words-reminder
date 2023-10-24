@@ -15,8 +15,8 @@ func NewStorage(db *db.Queries) Storage {
 	return &mySQLStorage{db: db}
 }
 
-func (s *mySQLStorage) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error) {
-	return s.db.SignUpUser(ctx, arg)
+func (s *mySQLStorage) CreateUser(ctx context.Context, arg db.CreateUserParams) (int64, error) {
+	return s.db.CreateUser(ctx, arg)
 }
 
 func (s *mySQLStorage) SetUserRefreshToken(ctx context.Context, arg db.SetUserRefreshTokenParams) error {

@@ -11,7 +11,7 @@ import (
 )
 
 type Service interface {
-	SignUpUser(context.Context, db.SignUpUserParams) (int64, error)
+	CreateUser(context.Context, db.CreateUserParams) (int64, error)
 	HashPassword(string) (string, error)
 	SetUserRefreshToken(ctx context.Context, id int64, token string) error
 	Login(ctx context.Context, info LoginInfo) (*Credentials, error)
@@ -54,7 +54,7 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 		return err
 	}
 
-	userId, err := h.s.SignUpUser(context.Background(), db.SignUpUserParams{
+	userId, err := h.s.CreateUser(context.Background(), db.CreateUserParams{
 		Username: (*signUpInfo).Username,
 		Password: hashedPass,
 	})

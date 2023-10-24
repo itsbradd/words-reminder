@@ -2,7 +2,7 @@
 SELECT * FROM user
 WHERE id = ? LIMIT 1;
 
-# name: SignUpUser :execlastid
+# name: CreateUser :execlastid
 INSERT INTO user (username, password)
 VALUES (?, ?);
 

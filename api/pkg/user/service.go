@@ -17,7 +17,7 @@ var (
 )
 
 type Storage interface {
-	SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error)
+	CreateUser(ctx context.Context, arg db.CreateUserParams) (int64, error)
 	SetUserRefreshToken(ctx context.Context, arg db.SetUserRefreshTokenParams) error
 	GetUserByUsername(ctx context.Context, username string) (db.User, error)
 }
@@ -43,8 +43,8 @@ func NewService(storage Storage, passHasher PassHasher, jwt JWTService) Service 
 	}
 }
 
-func (s *service) SignUpUser(ctx context.Context, arg db.SignUpUserParams) (int64, error) {
-	return s.storage.SignUpUser(ctx, arg)
+func (s *service) CreateUser(ctx context.Context, arg db.CreateUserParams) (int64, error) {
+	return s.storage.CreateUser(ctx, arg)
 }
 
 func (s *service) HashPassword(pass string) (string, error) {

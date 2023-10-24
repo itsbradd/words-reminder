@@ -10,6 +10,25 @@ import (
 	"database/sql"
 )
 
+const createUser = `-- name: CreateUser :execlastid
+# name: CreateUser :execlastid
+INSERT INTO user (username, password)
+VALUES (?, ?)
+`
+
+type CreateUserParams struct {
+	Username string
+	Password string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Password)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const getUser = `-- name: GetUser :one
 # name: GetUser :one
 SELECT id, username, password, refresh_token FROM user
@@ -60,23 +79,4 @@ type SetUserRefreshTokenParams struct {
 func (q *Queries) SetUserRefreshToken(ctx context.Context, arg SetUserRefreshTokenParams) error {
 	_, err := q.db.ExecContext(ctx, setUserRefreshToken, arg.RefreshToken, arg.ID)
 	return err
-}
-
-const signUpUser = `-- name: SignUpUser :execlastid
-# name: SignUpUser :execlastid
-INSERT INTO user (username, password)
-VALUES (?, ?)
-`
-
-type SignUpUserParams struct {
-	Username string
-	Password string
-}
-
-func (q *Queries) SignUpUser(ctx context.Context, arg SignUpUserParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, signUpUser, arg.Username, arg.Password)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
 }
