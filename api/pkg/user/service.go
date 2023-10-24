@@ -141,12 +141,7 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 
 	refresh, access, err := s.GenRefreshAndAccessToken(ctx, int64(user.ID))
 	if err != nil {
-		return nil, &pkg.FailRes{
-			StatusCode: fiber.StatusInternalServerError,
-			ErrorCode:  fiber.StatusInternalServerError,
-			Message:    "Something went wrong",
-			Errors:     nil,
-		}
+		return nil, fiber.ErrInternalServerError
 	}
 
 	return &Credentials{
