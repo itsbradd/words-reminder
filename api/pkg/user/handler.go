@@ -40,7 +40,7 @@ func NewHandler(s Service, jwt JWTService) Handler {
 func (h Handler) SignUp(c *fiber.Ctx) error {
 	signUpInfo := new(SignUpInfo)
 	if err := c.BodyParser(signUpInfo); err != nil {
-		return err
+		return pkg.ErrParseReqBody
 	}
 
 	err := signUpInfo.Validate()
