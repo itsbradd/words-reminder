@@ -109,8 +109,8 @@ func (h Handler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(pkg.SuccessRes[Credentials]{
-		Message: "Login success",
+	return c.Status(fiber.StatusOK).JSON(pkg.SuccessRes[Credentials]{
+		Message: "login success",
 		Data:    *credentials,
 	})
 }
