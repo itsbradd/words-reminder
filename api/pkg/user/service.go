@@ -103,12 +103,7 @@ func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (strin
 func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
 	err := info.Validate()
 	if err != nil {
-		return nil, &pkg.FailRes{
-			StatusCode: fiber.StatusBadRequest,
-			ErrorCode:  fiber.StatusBadRequest,
-			Message:    "Invalid parameters",
-			Errors:     err.(validation.Errors),
-		}
+		return nil, pkg.NewBodyValidationErr(err.(validation.Errors))
 	}
 
 	user, err := s.GetUserByUsername(ctx, info.Username)
