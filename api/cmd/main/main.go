@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/sonngocme/words-reminder-be/bootstrap"
+	"github.com/sonngocme/words-reminder-be/db"
 	"github.com/sonngocme/words-reminder-be/pkg/jwt"
 	"github.com/sonngocme/words-reminder-be/pkg/passhashing"
 	usermodule "github.com/sonngocme/words-reminder-be/pkg/user"
@@ -23,6 +24,6 @@ func main() {
 		usermodule.New(),
 		passhashing.New(),
 		jwt.New(),
-		fx.Invoke(func(*fiber.App) {}),
+		fx.Invoke(func(*fiber.App, *db.Queries) {}),
 	).Run()
 }

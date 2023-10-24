@@ -22,6 +22,10 @@ func NewDBConn(lc fx.Lifecycle) (*db.Queries, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = conn.Ping()
+	if err != nil {
+		return nil, err
+	}
 
 	queries := db.New(conn)
 
