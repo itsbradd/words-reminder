@@ -10,3 +10,19 @@ var (
 		Errors:     nil,
 	}
 )
+
+type SuccessRes[T any] struct {
+	Message string `json:"message"`
+	Data    T      `json:"data"`
+}
+
+type FailRes struct {
+	StatusCode int    `json:"-"`
+	ErrorCode  int    `json:"errorCode"`
+	Message    string `json:"message"`
+	Errors     any    `json:"errors,omitempty"`
+}
+
+func (f *FailRes) Error() string {
+	return f.Message
+}
