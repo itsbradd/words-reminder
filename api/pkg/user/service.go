@@ -14,6 +14,7 @@ import (
 var (
 	ErrGenRefreshToken = errors.New("errored when generating refresh token")
 	ErrGenAccessToken  = errors.New("errored when generating access token")
+	ErrUsernameExists  = errors.New("username already exists")
 )
 
 type Storage interface {
@@ -97,6 +98,22 @@ func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (strin
 		return "", "", ErrGenAccessToken
 	}
 	return token, accessToken, nil
+}
+
+func (s *service) IsUsernameExists(ctx context.Context, username string) error {
+	_, err := s.GetUserByUsername(ctx, username)
+
+	// Err is nil when return data has value (user exists)
+	if err == nil {
+		return ErrUsernameExists
+	}
+
+	// Errored when querying to the database
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fiber.ErrInternalServerError
+	}
+	// Username has not been taken
+	return nil
 }
 
 func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
