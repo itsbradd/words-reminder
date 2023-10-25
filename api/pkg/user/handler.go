@@ -12,7 +12,6 @@ import (
 
 type Service interface {
 	CreateUser(context.Context, db.CreateUserParams) (int64, error)
-	HashPassword(string) (string, error)
 	SetUserRefreshToken(ctx context.Context, id int64, token string) error
 	Login(ctx context.Context, info LoginInfo) (*Credentials, error)
 	SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error)

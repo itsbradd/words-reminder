@@ -48,11 +48,6 @@ func (s *service) CreateUser(ctx context.Context, arg db.CreateUserParams) (int6
 	return s.storage.CreateUser(ctx, arg)
 }
 
-func (s *service) HashPassword(pass string) (string, error) {
-	res, err := s.passHasher.HashPassword(pass)
-	return res, err
-}
-
 func (s *service) VerifyPassword(hashedPass, pass string) error {
 	return s.passHasher.VerifyPassword(hashedPass, pass)
 }
