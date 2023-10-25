@@ -15,6 +15,9 @@ $ go install github.com/pressly/goose/v3/cmd/goose@latest
 # Install Sqlc database queries generator
 $ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
+# Install swagger cli
+$ go install github.com/swaggo/swag/cmd/swag@latest
+
 # Install project dependencies
 $ go mod download
 
@@ -56,4 +59,13 @@ $ goose -dir sql/migrations mysql "root:thisisverysecret@/words_reminder?parseTi
 ## Generate database queries
 ```sh
 $ sqlc generate
+```
+
+## Swagger management
+```sh
+# Generate Swagger
+$ swag init -g cmd/main/main.go
+
+# Format Swagger
+$ swag fmt
 ```
