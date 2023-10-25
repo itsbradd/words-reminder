@@ -48,10 +48,6 @@ func (s *service) CreateUser(ctx context.Context, arg db.CreateUserParams) (int6
 	return s.storage.CreateUser(ctx, arg)
 }
 
-func (s *service) VerifyPassword(hashedPass, pass string) error {
-	return s.passHasher.VerifyPassword(hashedPass, pass)
-}
-
 func (s *service) SetUserRefreshToken(ctx context.Context, id int64, token string) error {
 	return s.storage.SetUserRefreshToken(ctx, db.SetUserRefreshTokenParams{
 		RefreshToken: sql.NullString{
@@ -168,7 +164,7 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 		}
 	}
 
-	err = s.VerifyPassword(user.Password, info.Password)
+	err = s.passHasher.VerifyPassword(user.Password, info.Password)
 	if err != nil {
 		return nil, &pkg.FailRes{
 			StatusCode: fiber.StatusBadRequest,
