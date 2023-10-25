@@ -15,6 +15,7 @@ type Service interface {
 	HashPassword(string) (string, error)
 	SetUserRefreshToken(ctx context.Context, id int64, token string) error
 	Login(ctx context.Context, info LoginInfo) (*Credentials, error)
+	SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error)
 }
 
 type JWTService interface {
@@ -49,48 +50,14 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 		return pkg.NewBodyValidationErr(err.(validation.Errors))
 	}
 
-	hashedPass, err := h.s.HashPassword((*signUpInfo).Password)
+	credentials, err := h.s.SignUp(c.Context(), *signUpInfo)
 	if err != nil {
 		return err
 	}
 
-	userId, err := h.s.CreateUser(context.Background(), db.CreateUserParams{
-		Username: (*signUpInfo).Username,
-		Password: hashedPass,
-	})
-	if err != nil {
-		return err
-	}
-
-	token, err := h.jwt.NewWithClaims(jwt.MapClaims{},
-		h.jwt.GenIssuerClaim("Words Reminder"),
-		h.jwt.GenSubjectClaim(userId),
-		h.jwt.GenAudienceClaim("Words Reminder"),
-		h.jwt.GenIssueAtClaim(time.Now()),
-	)
-	if err != nil {
-		return err
-	}
-
-	err = h.s.SetUserRefreshToken(context.Background(), userId, token)
-	if err != nil {
-		return nil
-	}
-
-	accessToken, err := h.jwt.NewWithClaims(jwt.MapClaims{},
-		h.jwt.GenIssuerClaim("Words Reminder"),
-		h.jwt.GenSubjectClaim(userId),
-		h.jwt.GenAudienceClaim("Words Reminder"),
-		h.jwt.GenIssueAtClaim(time.Now()),
-		h.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
-	)
-	if err != nil {
-		return nil
-	}
-
-	return c.Status(200).JSON(pkg.SuccessRes[string]{
+	return c.Status(fiber.StatusOK).JSON(pkg.SuccessRes[Credentials]{
 		Message: "Signup success!",
-		Data:    accessToken,
+		Data:    *credentials,
 	})
 }
 
