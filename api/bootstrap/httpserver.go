@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	"github.com/sonngocme/words-reminder-be/pkg"
 	"go.uber.org/fx"
 	"log"
@@ -24,6 +25,7 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 			return nil
 		},
 	})
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
