@@ -116,6 +116,48 @@ func (s *service) IsUsernameExists(ctx context.Context, username string) error {
 	return nil
 }
 
+func (s *service) SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error) {
+	if err := s.IsUsernameExists(ctx, info.Username); err != nil {
+		if errors.Is(err, ErrUsernameExists) {
+			return nil, &pkg.FailRes{
+				StatusCode: fiber.StatusBadRequest,
+				ErrorCode:  fiber.StatusBadRequest,
+				Message:    "username already exists",
+				Errors: struct {
+					Username string `json:"username"`
+				}{
+					Username: "username already exists",
+				},
+			}
+		}
+		return nil, fiber.ErrInternalServerError
+	}
+
+	hashedPass, err := s.passHasher.HashPassword(info.Password)
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
+	// Can return err duplicate username, above check doesn't in a transaction
+	userId, err := s.CreateUser(ctx, db.CreateUserParams{
+		Username: info.Username,
+		Password: hashedPass,
+	})
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
+	refresh, access, err := s.GenRefreshAndAccessToken(ctx, userId)
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return &Credentials{
+		RefreshToken: refresh,
+		AccessToken:  access,
+	}, nil
+}
+
 func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
 	user, err := s.GetUserByUsername(ctx, info.Username)
 	if err != nil {
