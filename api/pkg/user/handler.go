@@ -4,9 +4,9 @@ import (
 	"context"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofiber/fiber/v2"
-	"github.com/sonngocme/words-reminder-be/db"
-	"github.com/sonngocme/words-reminder-be/pkg"
-	"github.com/sonngocme/words-reminder-be/pkg/jwt"
+	"github.com/itsbradd/words-reminder-be/db"
+	"github.com/itsbradd/words-reminder-be/pkg"
+	"github.com/itsbradd/words-reminder-be/pkg/jwt"
 	"time"
 )
 

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
-	"github.com/sonngocme/words-reminder-be/pkg"
+	"github.com/itsbradd/words-reminder-be/pkg"
 	"go.uber.org/fx"
 	"log"
 	"os"

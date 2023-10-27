@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"github.com/sonngocme/words-reminder-be/db"
+	"github.com/itsbradd/words-reminder-be/db"
 )
 
 type mySQLStorage struct {

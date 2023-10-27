@@ -1,4 +1,4 @@
-module github.com/sonngocme/words-reminder-be
+module github.com/itsbradd/words-reminder-be
 
 go 1.21
 

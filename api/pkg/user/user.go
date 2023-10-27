@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/sonngocme/words-reminder-be/pkg"
-	"github.com/sonngocme/words-reminder-be/pkg/jwt"
-	"github.com/sonngocme/words-reminder-be/pkg/passhashing"
+	"github.com/itsbradd/words-reminder-be/pkg"
+	"github.com/itsbradd/words-reminder-be/pkg/jwt"
+	"github.com/itsbradd/words-reminder-be/pkg/passhashing"
 	"go.uber.org/fx"
 )
 

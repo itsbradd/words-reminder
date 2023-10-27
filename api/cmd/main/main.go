@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/itsbradd/words-reminder-be/bootstrap"
+	"github.com/itsbradd/words-reminder-be/db"
+	"github.com/itsbradd/words-reminder-be/pkg/jwt"
+	"github.com/itsbradd/words-reminder-be/pkg/passhashing"
+	usermodule "github.com/itsbradd/words-reminder-be/pkg/user"
 	"github.com/joho/godotenv"
-	"github.com/sonngocme/words-reminder-be/bootstrap"
-	"github.com/sonngocme/words-reminder-be/db"
-	"github.com/sonngocme/words-reminder-be/pkg/jwt"
-	"github.com/sonngocme/words-reminder-be/pkg/passhashing"
-	usermodule "github.com/sonngocme/words-reminder-be/pkg/user"
 	"go.uber.org/fx"
 	"log"
 )
