@@ -110,7 +110,7 @@ func (s *service) IsUsernameExists(ctx context.Context, username string) error {
 func (s *service) SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error) {
 	if err := s.IsUsernameExists(ctx, info.Username); err != nil {
 		if errors.Is(err, ErrUsernameExists) {
-			return nil, &pkg.FailRes{
+			return nil, &pkg.FailResponse[any]{
 				StatusCode: fiber.StatusBadRequest,
 				ErrorCode:  fiber.StatusBadRequest,
 				Message:    "username already exists",
@@ -152,7 +152,7 @@ func (s *service) SignUp(ctx context.Context, info SignUpInfo) (*Credentials, er
 func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, error) {
 	user, err := s.GetUserByUsername(ctx, info.Username)
 	if err != nil {
-		return nil, &pkg.FailRes{
+		return nil, &pkg.FailResponse[any]{
 			StatusCode: fiber.StatusBadRequest,
 			ErrorCode:  fiber.StatusBadRequest,
 			Message:    "user not found",
@@ -166,7 +166,7 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 
 	err = s.passHasher.VerifyPassword(user.Password, info.Password)
 	if err != nil {
-		return nil, &pkg.FailRes{
+		return nil, &pkg.FailResponse[any]{
 			StatusCode: fiber.StatusBadRequest,
 			ErrorCode:  fiber.StatusBadRequest,
 			Message:    "password is not match",

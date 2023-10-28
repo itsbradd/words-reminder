@@ -11,7 +11,7 @@ var (
 )
 
 var (
-	ErrParseReqBody = &FailRes{
+	ErrParseReqBody = &FailResponse[any]{
 		StatusCode: fiber.StatusBadRequest,
 		ErrorCode:  fiber.StatusBadRequest,
 		Message:    "Invalid parameters",
@@ -24,23 +24,35 @@ type SuccessRes[T any] struct {
 	Data    T      `json:"data"`
 }
 
-type FailRes struct {
+type FailResponse[T any] struct {
 	StatusCode int    `json:"-"`
 	ErrorCode  int    `json:"errorCode"`
 	Message    string `json:"message"`
-	Errors     any    `json:"errors,omitempty"`
+	Errors     T      `json:"errors,omitempty"`
 }
 
-func (f *FailRes) Error() string {
+func (f *FailResponse[T]) GetStatusCode() int {
+	return f.StatusCode
+}
+
+func (f *FailResponse[T]) GetErrorCode() int {
+	return f.ErrorCode
+}
+
+func (f *FailResponse[T]) GetErrors() T {
+	return f.Errors
+}
+
+func (f *FailResponse[T]) Error() string {
 	return f.Message
 }
 
-func NewBodyValidationErr(err validation.Errors, message ...string) *FailRes {
+func NewBodyValidationErr(err validation.Errors, message ...string) *FailResponse[validation.Errors] {
 	msg := ErrBodyValidation.Error()
 	if message != nil {
 		msg = message[0]
 	}
-	return &FailRes{
+	return &FailResponse[validation.Errors]{
 		StatusCode: fiber.StatusBadRequest,
 		ErrorCode:  fiber.StatusBadRequest,
 		Message:    msg,
