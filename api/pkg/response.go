@@ -19,7 +19,7 @@ var (
 	}
 )
 
-type SuccessRes[T any] struct {
+type Response[T any] struct {
 	Message string `json:"message"`
 	Data    T      `json:"data"`
 }

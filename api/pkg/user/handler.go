@@ -54,7 +54,7 @@ func (h Handler) SignUp(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(fiber.StatusOK).JSON(pkg.SuccessRes[Credentials]{
+	return c.Status(fiber.StatusOK).JSON(pkg.Response[Credentials]{
 		Message: "Signup success!",
 		Data:    *credentials,
 	})
@@ -75,7 +75,7 @@ func (h Handler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(fiber.StatusOK).JSON(pkg.SuccessRes[Credentials]{
+	return c.Status(fiber.StatusOK).JSON(pkg.Response[Credentials]{
 		Message: "login success",
 		Data:    *credentials,
 	})
