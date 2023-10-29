@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/swagger"
 	"github.com/itsbradd/words-reminder-be/pkg"
+	"github.com/mvrilo/go-redoc"
+	fiberredoc "github.com/mvrilo/go-redoc/fiber"
 	"go.uber.org/fx"
 	"log"
 	"os"
@@ -30,7 +31,12 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 			return nil
 		},
 	})
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	app.Use(fiberredoc.New(redoc.Redoc{
+		DocsPath: "/docs",
+		SpecPath: "/docs/openapi.yaml",
+		SpecFile: "./docs/openapi.yaml",
+		Title:    "Words Reminder API",
+	}))
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
