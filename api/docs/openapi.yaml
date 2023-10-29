@@ -1,0 +1,173 @@
+openapi: "3.1.0"
+info:
+  version: 0.0.1
+  title: Words Reminder API documentation
+paths:
+  /api/v1/users/signup:
+    post:
+      tags:
+        - users
+      requestBody:
+        $ref: "#/components/requestBodies/UserSignUpBody"
+      responses:
+        200:
+          $ref: "#/components/responses/UserSignUp200"
+        400:
+          $ref: "#/components/responses/UserSignUp400"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+  /api/v1/users/login:
+    post:
+      tags:
+        - users
+      requestBody:
+        $ref: "#/components/requestBodies/UserLoginBody"
+      responses:
+        200:
+          $ref: "#/components/responses/UserLogin200"
+        400:
+          $ref: "#/components/responses/UserLogin400"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # Common
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+          example: success message
+      required:
+        - message
+    FailResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: fail message
+        errorCode:
+          type: integer
+          example: 400
+      required:
+        - message
+        - errorCode
+    InvalidParameters:
+      type: object
+      additionalProperties:
+        type: string
+        example: invalid message
+    # Users
+    UserLoginInfo:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: secretpassword
+      required:
+        - username
+        - password
+    UserSignUpInfo:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: secretpassword
+      required:
+        - username
+        - password
+    UserCredentials:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      required:
+        - accessToken
+        - refreshToken
+  requestBodies:
+    # Users
+    UserSignUpBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserSignUpInfo"
+    UserLoginBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserLoginInfo"
+  responses:
+    # Common
+    InternalServerError:
+      content:
+        text/plain; charset=utf-8:
+          schema:
+            type: string
+            enum:
+              - Internal Server Error
+    # Users
+    UserSignUp200:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/Response"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/UserCredentials"
+                required:
+                  - data
+    UserSignUp400:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/FailResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/InvalidParameters"
+                required:
+                  - data
+    UserLogin200:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/Response"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/UserCredentials"
+                required:
+                  - data
+    UserLogin400:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/FailResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/InvalidParameters"
+                required:
+                  - data
