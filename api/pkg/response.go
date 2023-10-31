@@ -4,6 +4,7 @@ import (
 	"errors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gofiber/fiber/v2"
+	"github.com/itsbradd/words-reminder-be/pkg/jwt"
 )
 
 var (
@@ -58,4 +59,24 @@ func NewBodyValidationErr(err validation.Errors, message ...string) *FailRespons
 		Message:    msg,
 		Errors:     err,
 	}
+}
+
+func NewJWTTokenErr(err error) error {
+	genBadReqErr := func(msg string) *FailResponse[any] {
+		return &FailResponse[any]{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    msg,
+			Errors:     nil,
+		}
+	}
+	switch {
+	case errors.Is(err, jwt.ErrTokenMalformed):
+		return genBadReqErr("invalid token")
+	case errors.Is(err, jwt.ErrTokenSignatureInvalid):
+		return genBadReqErr("invalid token signature")
+	case errors.Is(err, jwt.ErrTokenExpired):
+		return genBadReqErr("token is expired")
+	}
+	return fiber.ErrInternalServerError
 }
