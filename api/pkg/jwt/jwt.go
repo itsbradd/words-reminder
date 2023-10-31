@@ -20,10 +20,7 @@ type GenClaimOpts func(claims MapClaims)
 
 func (s *Service) NewWithClaims(claims MapClaims, opts ...GenClaimOpts) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
-	copyClaims := maps.Clone(claims)
-	for _, optFunc := range opts {
-		optFunc(copyClaims)
-	}
+	copyClaims := s.GenClaimOptions(claims, opts...)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(copyClaims))
 	return token.SignedString([]byte(secret))
 }
