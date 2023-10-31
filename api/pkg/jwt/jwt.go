@@ -28,6 +28,14 @@ func (s *Service) NewWithClaims(claims MapClaims, opts ...GenClaimOpts) (string,
 	return token.SignedString([]byte(secret))
 }
 
+func (s *Service) GenClaimOptions(claims MapClaims, opts ...GenClaimOpts) MapClaims {
+	copyClaims := maps.Clone(claims)
+	for _, optFunc := range opts {
+		optFunc(copyClaims)
+	}
+	return copyClaims
+}
+
 func (s *Service) GenIssuerClaim(val string) GenClaimOpts {
 	return func(claims MapClaims) {
 		claims["iss"] = val
