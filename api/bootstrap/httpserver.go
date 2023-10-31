@@ -28,7 +28,8 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 				return ctx.Status(e.Code).SendString(e.Error())
 			}
 
-			return nil
+			serverError := fiber.ErrInternalServerError
+			return ctx.Status(serverError.Code).SendString(serverError.Error())
 		},
 	})
 
