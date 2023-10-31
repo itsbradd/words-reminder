@@ -8,7 +8,30 @@ import (
 	"time"
 )
 
-type MapClaims jwt.MapClaims
+type MapClaims = jwt.MapClaims
+type Token = jwt.Token
+
+var (
+	ErrTokenMalformed        = jwt.ErrTokenMalformed
+	ErrTokenSignatureInvalid = jwt.ErrTokenSignatureInvalid
+	ErrTokenExpired          = jwt.ErrTokenExpired
+)
+
+//var (
+//	ErrInvalidKey                = jwt.ErrInvalidKey
+//	ErrInvalidKeyType            = jwt.ErrInvalidKeyType
+//	ErrHashUnavailable           = jwt.ErrHashUnavailable
+//	ErrTokenUnverifiable         = jwt.ErrTokenUnverifiable
+//	ErrTokenRequiredClaimMissing = jwt.ErrTokenRequiredClaimMissing
+//	ErrTokenInvalidAudience      = jwt.ErrTokenInvalidAudience
+//	ErrTokenUsedBeforeIssued     = jwt.ErrTokenUsedBeforeIssued
+//	ErrTokenInvalidIssuer        = jwt.ErrTokenInvalidIssuer
+//	ErrTokenInvalidSubject       = jwt.ErrTokenInvalidSubject
+//	ErrTokenNotValidYet          = jwt.ErrTokenNotValidYet
+//	ErrTokenInvalidId            = jwt.ErrTokenInvalidId
+//	ErrTokenInvalidClaims        = jwt.ErrTokenInvalidClaims
+//	ErrInvalidType               = jwt.ErrInvalidType
+//)
 
 type Service struct{}
 
