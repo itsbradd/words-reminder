@@ -31,12 +31,6 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 			return nil
 		},
 	})
-	app.Use(fiberredoc.New(redoc.Redoc{
-		DocsPath: "/docs",
-		SpecPath: "/docs/openapi.yaml",
-		SpecFile: "./docs/openapi.yaml",
-		Title:    "Words Reminder API",
-	}))
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -44,6 +38,13 @@ func NewHTTPServer(lc fx.Lifecycle, routers []pkg.AppRouter) *fiber.App {
 	for _, router := range routers {
 		router.Setup(v1)
 	}
+
+	app.Use(fiberredoc.New(redoc.Redoc{
+		DocsPath: "/docs",
+		SpecPath: "/docs/openapi.yaml",
+		SpecFile: "./docs/openapi.yaml",
+		Title:    "Words Reminder API",
+	}))
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
