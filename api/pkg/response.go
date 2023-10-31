@@ -80,3 +80,20 @@ func NewJWTTokenErr(err error) error {
 	}
 	return fiber.ErrInternalServerError
 }
+
+func NewBadReqErr[T any](msg string, errs ...T) error {
+	if errs != nil && len(errs) > 0 {
+		return &FailResponse[T]{
+			StatusCode: fiber.StatusBadRequest,
+			ErrorCode:  fiber.StatusBadRequest,
+			Message:    msg,
+			Errors:     errs[0],
+		}
+	}
+	return &FailResponse[any]{
+		StatusCode: fiber.StatusBadRequest,
+		ErrorCode:  fiber.StatusBadRequest,
+		Message:    msg,
+		Errors:     nil,
+	}
+}
