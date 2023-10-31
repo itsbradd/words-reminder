@@ -35,6 +35,7 @@ type JWTService interface {
 	GenAudienceClaim(val string) jwt.GenClaimOpts
 	GenIssueAtClaim(val time.Time) jwt.GenClaimOpts
 	GenExpireTimeClaim(val time.Time) jwt.GenClaimOpts
+	GenClaimOptions(claims jwt.MapClaims, opts ...jwt.GenClaimOpts) jwt.MapClaims
 }
 
 type service struct {
@@ -77,49 +78,43 @@ func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (strin
 		error error
 	}
 
+	genToken := func(ch chan<- Token, claims jwt.MapClaims) {
+		go func(c jwt.MapClaims) {
+			token, err := s.jwt.NewWithClaims(c)
+			if err != nil {
+				ch <- Token{
+					token: "",
+					error: err,
+				}
+				return
+			}
+			ch <- Token{
+				token: token,
+				error: nil,
+			}
+		}(claims)
+	}
+
 	refreshTokenCh := make(chan Token)
 	accessTokenCh := make(chan Token)
 
-	go func(ch chan<- Token) {
-		token, err := s.jwt.NewWithClaims(jwt.MapClaims{},
-			s.jwt.GenIssuerClaim("Words Reminder"),
-			s.jwt.GenSubjectClaim(id),
-			s.jwt.GenAudienceClaim("Words Reminder"),
-			s.jwt.GenIssueAtClaim(time.Now()),
-		)
-		if err != nil {
-			ch <- Token{
-				token: "",
-				error: err,
-			}
-			return
-		}
-		ch <- Token{
-			token: token,
-			error: nil,
-		}
-	}(refreshTokenCh)
-
-	go func(ch chan<- Token) {
-		accessToken, err := s.jwt.NewWithClaims(jwt.MapClaims{},
-			s.jwt.GenIssuerClaim("Words Reminder"),
-			s.jwt.GenSubjectClaim(id),
-			s.jwt.GenAudienceClaim("Words Reminder"),
-			s.jwt.GenIssueAtClaim(time.Now()),
-			s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
-		)
-		if err != nil {
-			ch <- Token{
-				token: "",
-				error: err,
-			}
-			return
-		}
-		ch <- Token{
-			token: accessToken,
-			error: nil,
-		}
-	}(accessTokenCh)
+	refreshTokenClaims := s.jwt.GenClaimOptions(jwt.MapClaims{},
+		s.jwt.GenIssuerClaim("Words Reminder"),
+		s.jwt.GenSubjectClaim(id),
+		s.jwt.GenAudienceClaim("Words Reminder"),
+		s.jwt.GenIssueAtClaim(time.Now()),
+	)
+	accessTokenClaims := s.jwt.GenClaimOptions(jwt.MapClaims{},
+		s.jwt.GenIssuerClaim("Words Reminder"),
+		s.jwt.GenSubjectClaim(id),
+		s.jwt.GenAudienceClaim("Words Reminder"),
+		s.jwt.GenIssueAtClaim(time.Now()),
+		s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
+	)
+	// Gen Refresh Token
+	genToken(refreshTokenCh, refreshTokenClaims)
+	// Gen Access Token
+	genToken(accessTokenCh, accessTokenClaims)
 
 	refreshToken := <-refreshTokenCh
 	accessToken := <-accessTokenCh
