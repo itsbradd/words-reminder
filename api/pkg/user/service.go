@@ -28,6 +28,15 @@ type PassHasher interface {
 	VerifyPassword(hashedPassword, pass string) error
 }
 
+type JWTService interface {
+	NewWithClaims(jwt.MapClaims, ...jwt.GenClaimOpts) (string, error)
+	GenIssuerClaim(val string) jwt.GenClaimOpts
+	GenSubjectClaim(val any) jwt.GenClaimOpts
+	GenAudienceClaim(val string) jwt.GenClaimOpts
+	GenIssueAtClaim(val time.Time) jwt.GenClaimOpts
+	GenExpireTimeClaim(val time.Time) jwt.GenClaimOpts
+}
+
 type service struct {
 	storage    Storage
 	passHasher PassHasher

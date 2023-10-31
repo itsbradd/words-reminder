@@ -13,7 +13,7 @@ func New() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				NewHandler,
-				fx.From(new(Service), new(*jwt.Service)),
+				fx.From(new(Service)),
 			),
 			fx.Annotate(
 				NewService,

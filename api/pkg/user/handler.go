@@ -6,8 +6,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/itsbradd/words-reminder-be/db"
 	"github.com/itsbradd/words-reminder-be/pkg"
-	"github.com/itsbradd/words-reminder-be/pkg/jwt"
-	"time"
 )
 
 type Service interface {
@@ -17,24 +15,13 @@ type Service interface {
 	SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error)
 }
 
-type JWTService interface {
-	NewWithClaims(jwt.MapClaims, ...jwt.GenClaimOpts) (string, error)
-	GenIssuerClaim(val string) jwt.GenClaimOpts
-	GenSubjectClaim(val any) jwt.GenClaimOpts
-	GenAudienceClaim(val string) jwt.GenClaimOpts
-	GenIssueAtClaim(val time.Time) jwt.GenClaimOpts
-	GenExpireTimeClaim(val time.Time) jwt.GenClaimOpts
-}
-
 type Handler struct {
-	s   Service
-	jwt JWTService
+	s Service
 }
 
-func NewHandler(s Service, jwt JWTService) Handler {
+func NewHandler(s Service) Handler {
 	return Handler{
-		s:   s,
-		jwt: jwt,
+		s: s,
 	}
 }
 
