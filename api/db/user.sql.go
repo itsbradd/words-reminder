@@ -47,6 +47,24 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
+const getUserByID = `-- name: GetUserByID :one
+# name: GetUserByID :one
+SELECT id, username, password, refresh_token FROM user
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.RefreshToken,
+	)
+	return i, err
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :one
 # name: GetUserByUsername :one
 SELECT id, username, password, refresh_token FROM user

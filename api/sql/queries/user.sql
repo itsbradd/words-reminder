@@ -13,3 +13,7 @@ WHERE id = ?;
 # name: GetUserByUsername :one
 SELECT * FROM user
 WHERE username = ? LIMIT 1;
+
+# name: GetUserByID :one
+SELECT * FROM user
+WHERE id = ? LIMIT 1;

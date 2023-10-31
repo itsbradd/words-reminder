@@ -26,3 +26,7 @@ func (s *mySQLStorage) SetUserRefreshToken(ctx context.Context, arg db.SetUserRe
 func (s *mySQLStorage) GetUserByUsername(ctx context.Context, username string) (db.User, error) {
 	return s.db.GetUserByUsername(ctx, username)
 }
+
+func (s *mySQLStorage) GetUserByID(ctx context.Context, id int32) (db.User, error) {
+	return s.db.GetUserByID(ctx, id)
+}
