@@ -63,32 +63,70 @@ func (s *service) GetUserByUsername(ctx context.Context, username string) (db.Us
 }
 
 func (s *service) GenRefreshAndAccessToken(ctx context.Context, id int64) (string, string, error) {
-	token, err := s.jwt.NewWithClaims(jwt.MapClaims{},
-		s.jwt.GenIssuerClaim("Words Reminder"),
-		s.jwt.GenSubjectClaim(id),
-		s.jwt.GenAudienceClaim("Words Reminder"),
-		s.jwt.GenIssueAtClaim(time.Now()),
-	)
-	if err != nil {
-		return "", "", ErrGenRefreshToken
+	type Token struct {
+		token string
+		error error
 	}
 
-	err = s.SetUserRefreshToken(ctx, id, token)
-	if err != nil {
+	refreshTokenCh := make(chan Token)
+	accessTokenCh := make(chan Token)
+
+	go func(ch chan<- Token) {
+		token, err := s.jwt.NewWithClaims(jwt.MapClaims{},
+			s.jwt.GenIssuerClaim("Words Reminder"),
+			s.jwt.GenSubjectClaim(id),
+			s.jwt.GenAudienceClaim("Words Reminder"),
+			s.jwt.GenIssueAtClaim(time.Now()),
+		)
+		if err != nil {
+			ch <- Token{
+				token: "",
+				error: err,
+			}
+			return
+		}
+		ch <- Token{
+			token: token,
+			error: nil,
+		}
+	}(refreshTokenCh)
+
+	go func(ch chan<- Token) {
+		accessToken, err := s.jwt.NewWithClaims(jwt.MapClaims{},
+			s.jwt.GenIssuerClaim("Words Reminder"),
+			s.jwt.GenSubjectClaim(id),
+			s.jwt.GenAudienceClaim("Words Reminder"),
+			s.jwt.GenIssueAtClaim(time.Now()),
+			s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
+		)
+		if err != nil {
+			ch <- Token{
+				token: "",
+				error: err,
+			}
+			return
+		}
+		ch <- Token{
+			token: accessToken,
+			error: nil,
+		}
+	}(accessTokenCh)
+
+	refreshToken := <-refreshTokenCh
+	accessToken := <-accessTokenCh
+	if refreshToken.error != nil {
 		return "", "", ErrGenRefreshToken
 	}
-
-	accessToken, err := s.jwt.NewWithClaims(jwt.MapClaims{},
-		s.jwt.GenIssuerClaim("Words Reminder"),
-		s.jwt.GenSubjectClaim(id),
-		s.jwt.GenAudienceClaim("Words Reminder"),
-		s.jwt.GenIssueAtClaim(time.Now()),
-		s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
-	)
-	if err != nil {
+	if accessToken.error != nil {
 		return "", "", ErrGenAccessToken
 	}
-	return token, accessToken, nil
+
+	err := s.SetUserRefreshToken(ctx, id, refreshToken.token)
+	if err != nil {
+		return "", "", ErrGenRefreshToken
+	}
+
+	return refreshToken.token, accessToken.token, nil
 }
 
 func (s *service) IsUsernameExists(ctx context.Context, username string) error {
