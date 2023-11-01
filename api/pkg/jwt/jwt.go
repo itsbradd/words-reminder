@@ -10,6 +10,7 @@ import (
 
 type MapClaims = jwt.MapClaims
 type Token = jwt.Token
+type Claims = jwt.Claims
 
 var (
 	ErrTokenMalformed        = jwt.ErrTokenMalformed
@@ -84,6 +85,12 @@ func (s *Service) GenIssueAtClaim(val time.Time) GenClaimOpts {
 	return func(claims MapClaims) {
 		claims["iat"] = val.UnixMilli()
 	}
+}
+
+func (s *Service) Parse(tokenString string) (*jwt.Token, error) {
+	return jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
 }
 
 func New() fx.Option {

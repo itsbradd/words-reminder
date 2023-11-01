@@ -17,4 +17,5 @@ func (r Router) Setup(routerGroup fiber.Router) {
 	router := routerGroup.Group(r.path)
 	router.Post("/signup", r.userHandler.SignUp)
 	router.Post("/login", r.userHandler.Login)
+	router.Post("/refresh", r.userHandler.RefreshAccessToken)
 }

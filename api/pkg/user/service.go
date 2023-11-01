@@ -21,6 +21,7 @@ type Storage interface {
 	CreateUser(ctx context.Context, arg db.CreateUserParams) (int64, error)
 	SetUserRefreshToken(ctx context.Context, arg db.SetUserRefreshTokenParams) error
 	GetUserByUsername(ctx context.Context, username string) (db.User, error)
+	GetUserByID(ctx context.Context, id int32) (db.User, error)
 }
 
 type PassHasher interface {
@@ -36,6 +37,7 @@ type JWTService interface {
 	GenIssueAtClaim(val time.Time) jwt.GenClaimOpts
 	GenExpireTimeClaim(val time.Time) jwt.GenClaimOpts
 	GenClaimOptions(claims jwt.MapClaims, opts ...jwt.GenClaimOpts) jwt.MapClaims
+	Parse(tokenString string) (*jwt.Token, error)
 }
 
 type service struct {
@@ -229,4 +231,62 @@ func (s *service) Login(ctx context.Context, info LoginInfo) (*Credentials, erro
 		RefreshToken: refresh,
 		AccessToken:  access,
 	}, nil
+}
+
+func (s *service) getAccessTokenClaims(userId int32) jwt.MapClaims {
+	return s.jwt.GenClaimOptions(jwt.MapClaims{},
+		s.jwt.GenIssuerClaim("Words Reminder"),
+		s.jwt.GenSubjectClaim(userId),
+		s.jwt.GenAudienceClaim("Words Reminder"),
+		s.jwt.GenIssueAtClaim(time.Now()),
+		s.jwt.GenExpireTimeClaim(time.Now().Add(1*time.Minute)),
+	)
+}
+
+func (s *service) getUserIdFromTokenClaims(claims jwt.Claims) (int32, error) {
+	claimsMap, ok := claims.(jwt.MapClaims)
+	if !ok {
+		return 0, fiber.ErrInternalServerError
+	}
+	sub, ok := claimsMap["sub"]
+	if !ok {
+		return 0, fiber.ErrInternalServerError
+	}
+	userId, ok := sub.(float64) // Default encoding/json parse number info float64
+	if !ok {
+		return 0, fiber.ErrInternalServerError
+	}
+	return int32(userId), nil
+}
+
+func (s *service) RefreshAccessToken(ctx context.Context, info RefreshAccessTokenInfo) (*AccessToken, error) {
+	token, err := s.jwt.Parse(info.RefreshToken)
+	if err != nil {
+		return nil, pkg.NewJWTTokenErr(err)
+	}
+	if !token.Valid {
+		return nil, pkg.NewBadReqErr[any]("invalid token")
+	}
+
+	userId, err := s.getUserIdFromTokenClaims(token.Claims)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.storage.GetUserByID(ctx, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, pkg.NewBadReqErr[any]("invalid token") // because the subject contains invalid user id
+		}
+		return nil, fiber.ErrInternalServerError
+	}
+	if user.RefreshToken.String != token.Raw {
+		return nil, pkg.NewBadReqErr[any]("invalid token")
+	}
+	newToken, err := s.jwt.NewWithClaims(s.getAccessTokenClaims(user.ID))
+	if err != nil {
+		return nil, ErrGenAccessToken
+	}
+
+	return &AccessToken{AccessToken: newToken}, nil
 }

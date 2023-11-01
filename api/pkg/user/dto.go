@@ -30,3 +30,17 @@ type Credentials struct {
 	RefreshToken string `json:"refreshToken"`
 	AccessToken  string `json:"accessToken"`
 }
+
+type RefreshAccessTokenInfo struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
+func (i RefreshAccessTokenInfo) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.RefreshToken, validation.Required),
+	)
+}
+
+type AccessToken struct {
+	AccessToken string `json:"accessToken"`
+}

@@ -13,6 +13,7 @@ type Service interface {
 	SetUserRefreshToken(ctx context.Context, id int64, token string) error
 	Login(ctx context.Context, info LoginInfo) (*Credentials, error)
 	SignUp(ctx context.Context, info SignUpInfo) (*Credentials, error)
+	RefreshAccessToken(ctx context.Context, info RefreshAccessTokenInfo) (*AccessToken, error)
 }
 
 type Handler struct {
@@ -65,5 +66,26 @@ func (h Handler) Login(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(pkg.Response[Credentials]{
 		Message: "login success",
 		Data:    *credentials,
+	})
+}
+
+func (h Handler) RefreshAccessToken(c *fiber.Ctx) error {
+	refreshAccessTokenInfo := new(RefreshAccessTokenInfo)
+	if err := c.BodyParser(refreshAccessTokenInfo); err != nil {
+		return pkg.ErrParseReqBody
+	}
+	err := refreshAccessTokenInfo.Validate()
+	if err != nil {
+		return pkg.NewBodyValidationErr(err.(validation.Errors))
+	}
+
+	accessToken, err := h.s.RefreshAccessToken(c.Context(), *refreshAccessTokenInfo)
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusOK).JSON(pkg.Response[AccessToken]{
+		Message: "refresh access token succeed",
+		Data:    *accessToken,
 	})
 }
