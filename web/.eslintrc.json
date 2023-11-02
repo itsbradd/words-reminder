@@ -3,6 +3,15 @@
     "next/core-web-vitals",
     "next",
     "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
     "prettier"
-  ]
+  ],
+  "plugins": ["prettier", "unused-imports", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "prettier/prettier": "warn",
+    "unused-imports/no-unused-imports": "warn",
+    "@typescript-eslint/no-unused-vars": "warn"
+  },
+  "root": true
 }
